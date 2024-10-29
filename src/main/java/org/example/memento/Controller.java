@@ -1,5 +1,7 @@
 package org.example.memento;
 
+import javafx.scene.control.ListView;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,6 +10,7 @@ public class Controller {
     private Gui gui;
     private List<IMemento> history; // Memento history
     private List<IMemento> undoHistory;
+    private List<IMemento> historyList;
 
     public Controller(Gui gui) {
         this.model = new Model();
@@ -20,6 +23,7 @@ public class Controller {
         saveToHistory();
         clearUndoHistory();
         model.setOption(optionNumber, choice);
+        setHistoryItems();
     }
 
     public int getOption(int optionNumber) {
@@ -30,6 +34,7 @@ public class Controller {
         saveToHistory();
         clearUndoHistory();
         model.setIsSelected(isSelected);
+        setHistoryItems();
     }
 
     public boolean getIsSelected() {
@@ -64,5 +69,15 @@ public class Controller {
         IMemento currentState = model.createMemento();
         history.add(currentState);
         undoHistory.add(currentState);
+    }
+
+    public void setHistoryItems() {
+        historyList = history;
+        System.out.println(historyList);
+        gui.setHistory(history);
+    }
+
+    public void restoreState(IMemento currentState) {
+        model.restoreState(currentState);
     }
 }

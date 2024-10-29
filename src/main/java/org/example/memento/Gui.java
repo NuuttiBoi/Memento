@@ -2,13 +2,18 @@ package org.example.memento;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.geometry.Insets;
 import javafx.scene.input.KeyCode;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Gui extends Application {
 
@@ -18,6 +23,8 @@ public class Gui extends Application {
     private ColorBox colorBox2;
     private ColorBox colorBox3;
     private CheckBox checkBox;
+    private Button button;
+    private ListView<IMemento> historyList = new ListView<>();
 
     public void start(Stage stage) {
 
@@ -35,6 +42,11 @@ public class Gui extends Application {
         checkBox = new CheckBox("Click me!");
         checkBox.setPadding(insets);
 
+        button = new Button("View History");
+        button.setPadding(insets);
+
+        button.setOnMouseClicked(mouseEvent ->{openHistoryWindow();});
+
         // Add the ColorBoxes and CheckBox to a HBox
         HBox hBox = new HBox(colorBox1.getRectangle(), colorBox2.getRectangle(), colorBox3.getRectangle());
         hBox.setSpacing(10);
@@ -50,7 +62,7 @@ public class Gui extends Application {
         label2.setPadding(insets);
 
         // create a VBox that contains the HBox and the CheckBox
-        VBox vBox = new VBox(hBox, checkBox, label, label2);
+        VBox vBox = new VBox(hBox, checkBox, button, label, label2);
         // call controller when the CheckBox is clicked
         checkBox.setOnAction(event -> {
             controller.setIsSelected(checkBox.isSelected());
@@ -82,5 +94,27 @@ public class Gui extends Application {
         colorBox2.setColor(controller.getOption(2));
         colorBox3.setColor(controller.getOption(3));
         checkBox.setSelected(controller.getIsSelected());
+    }
+
+    public void openHistoryWindow(){
+        VBox vbox = new VBox(historyList);
+        historyList.setOnMouseClicked(event ->{
+            IMemento iMemento = historyList.getSelectionModel().getSelectedItem();
+            Stage stage1 = (Stage) historyList.getScene().getWindow();
+            stage1.close();
+            controller.restoreState(iMemento);
+            updateGui();
+        });
+        vbox.setPadding(new Insets(10, 10, 10, 10));
+        Scene scene = new Scene(vbox);
+        Stage stage1 = new Stage();
+        stage1.setScene(scene);
+        stage1.show();
+    }
+
+    public void setHistory(List<IMemento> history) {
+        List<IMemento> newHistory = new ArrayList<>();
+        newHistory.addAll(history);
+        historyList.getItems().addAll(newHistory);
     }
 }
